@@ -5,11 +5,10 @@ import { cn } from "@/lib/utils"; // Import your utility function
 export default function Home() {
   return (
     <>
-      <Navbar />
       <BgGradient className="" />
-      <div className="min-h-screen  text-gray-900">
+      <div className="min-h-screen ">
         {/* Hero Section with BgGradient */}
-        <section className="relative text-black bg-transparent py-32 overflow-hidden">
+        <section className="relative text-foreground bg-transparent py-32 overflow-hidden">
           {/* Use your BgGradient here */}
           <div className="container mx-auto px-6 text-center relative z-10">
             <h1 className="text-6xl font-bold mb-6 animate-fade-in">
@@ -44,7 +43,7 @@ export default function Home() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Feature 1 */}
-              <div className="bg-white p-8 rounded-lg shadow-md text-center hover:shadow-xl transition duration-300 animate-fade-in delay-100">
+              <div className=" p-8 rounded-lg shadow-md text-center hover:shadow-xl transition duration-300 animate-fade-in delay-100">
                 <div className="text-4xl mb-4 text-[#6D28D9]">🚀</div>
                 <h3 className="text-2xl font-bold mb-4">Lightning Fast</h3>
                 <p className="text-gray-600">
