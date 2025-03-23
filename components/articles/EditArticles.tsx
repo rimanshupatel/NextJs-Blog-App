@@ -7,16 +7,23 @@ import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import "react-quill-new/dist/quill.snow.css";
 import dynamic from "next/dynamic";
-import { createArticles } from "@/actions/articleActions";
+import { Articles } from "@prisma/client";
+import { updateArticlesActions } from "@/actions/updateArticlesActions";
 
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
-export function EditArticles() {
-  const [content, setContent] = useState("");
+type EditPropsPage = {
+  article: Articles;
+};
+const EditArticles: React.FC<EditPropsPage> = ({ article }) => {
+  const [content, setContent] = useState(article.content);
 
-  const [formState, action, isPending] = useActionState(createArticles, {
-    errors: {}, // Initialize with an empty errors object
-  });
+  const [formState, action, isPending] = useActionState(
+    updateArticlesActions.bind(null, article.id),
+    {
+      errors: {}, // Initialize with an empty errors object
+    }
+  );
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -29,7 +36,6 @@ export function EditArticles() {
       action(formData);
     });
   };
-
   return (
     <div className="max-w-4xl mx-auto p-6">
       <Card>
@@ -44,6 +50,7 @@ export function EditArticles() {
               <Input
                 id="title"
                 name="title"
+                defaultValue={article.title}
                 placeholder="Enter article title"
               />
               {formState.errors?.title && (
@@ -59,6 +66,7 @@ export function EditArticles() {
               <select
                 id="category"
                 name="category"
+                defaultValue={article.category}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 <option value="">Select Category</option>
@@ -82,6 +90,10 @@ export function EditArticles() {
                 name="featuredImage"
                 type="file"
                 accept="image/*"
+              />
+              <img
+                src={article.featuredImage}
+                className="w-48 h-48 object-cover rounded-md"
               />
               {formState.errors?.featuredImage && (
                 <span className="font-medium text-sm text-red-500">
@@ -114,7 +126,7 @@ export function EditArticles() {
                 Cancel
               </Button>
               <Button disabled={isPending} type="submit">
-                {isPending ? "Loading..." : "Publish Article"}
+                {isPending ? "Loading..." : "Edit Article"}
               </Button>
             </div>
           </form>
@@ -122,4 +134,6 @@ export function EditArticles() {
       </Card>
     </div>
   );
-}
+};
+
+export default EditArticles;

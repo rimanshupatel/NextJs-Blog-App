@@ -12,6 +12,9 @@ import {
 } from "../../ui/table";
 import Link from "next/link";
 import { Prisma } from "@prisma/client";
+import { useFormStatus } from "react-dom";
+import { deleteArticle } from "@/actions/deleteArticleAction";
+import { startTransition } from "react";
 
 type RecentArticlesProps = {
   articles: Prisma.ArticlesGetPayload<{
@@ -54,7 +57,7 @@ const RecentArticles: React.FC<RecentArticlesProps> = ({ articles }) => {
             </TableHeader>
             <TableBody>
               {articles.map((articles) => (
-                <TableRow>
+                <TableRow key={articles.id}>
                   <TableCell className="font-medium">
                     {articles.title}
                   </TableCell>
@@ -72,9 +75,7 @@ const RecentArticles: React.FC<RecentArticlesProps> = ({ articles }) => {
                           Edit
                         </Button>
                       </Link>
-                      <Button variant="ghost" size="sm">
-                        delete
-                      </Button>
+                      <DeleteButtonArticle articleId={articles.id} />
                     </div>
                   </TableCell>
                 </TableRow>
@@ -88,3 +89,23 @@ const RecentArticles: React.FC<RecentArticlesProps> = ({ articles }) => {
 };
 
 export default RecentArticles;
+
+type DeleteButtonProps = {
+  articleId: string;
+};
+const DeleteButtonArticle: React.FC<DeleteButtonProps> = ({ articleId }) => {
+  const { pending } = useFormStatus();
+  return (
+    <form
+      action={() => {
+        startTransition(async () => {
+          await deleteArticle(articleId);
+        });
+      }}
+    >
+      <Button disabled={pending} variant={"ghost"} size={"sm"} type="submit">
+        {pending ? "Loading" : "Delete"}
+      </Button>
+    </form>
+  );
+};
