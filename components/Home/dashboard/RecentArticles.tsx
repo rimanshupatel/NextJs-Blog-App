@@ -11,7 +11,23 @@ import {
   TableRow,
 } from "../../ui/table";
 import Link from "next/link";
-const RecentArticles = () => {
+import { Prisma } from "@prisma/client";
+
+type RecentArticlesProps = {
+  articles: Prisma.ArticlesGetPayload<{
+    include: {
+      comments: true;
+      author: {
+        select: {
+          name: true;
+          email: true;
+          imageUrl: true;
+        };
+      };
+    };
+  }>[];
+};
+const RecentArticles: React.FC<RecentArticlesProps> = ({ articles }) => {
   return (
     <Card className="mb-8">
       <CardHeader>
@@ -22,42 +38,51 @@ const RecentArticles = () => {
           </Button>
         </div>
       </CardHeader>
-
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Comments</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell className="font-medium">testing</TableCell>
-              <TableCell>
-                <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
-                  Published
-                </span>
-              </TableCell>
-              <TableCell>1</TableCell>
-              <TableCell>{new Date().toDateString()}</TableCell>
-              <TableCell>
-                <div className="flex gap-2">
-                  <Link href={`/dashboard/articles/1/edit`}>
-                    <Button variant="ghost" size="sm">
-                      Edit
-                    </Button>
-                  </Link>
-                  {/* <DeleteButton articleId={article.id} /> */}
-                </div>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </CardContent>
+      {!articles.length ? (
+        <CardContent>No articles found</CardContent>
+      ) : (
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Title</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Comments</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {articles.map((articles) => (
+                <TableRow>
+                  <TableCell className="font-medium">
+                    {articles.title}
+                  </TableCell>
+                  <TableCell>
+                    <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                      Published
+                    </span>
+                  </TableCell>
+                  <TableCell>{articles.comments.length}</TableCell>
+                  <TableCell>{new Date().toDateString()}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Link href={`/dashboard/articles/${articles.id}/edit`}>
+                        <Button variant="ghost" size="sm">
+                          Edit
+                        </Button>
+                      </Link>
+                      <Button variant="ghost" size="sm">
+                        delete
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      )}
     </Card>
   );
 };

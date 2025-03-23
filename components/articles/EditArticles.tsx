@@ -11,7 +11,7 @@ import { createArticles } from "@/actions/articleActions";
 
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
-export function CreateArticlePage() {
+export function EditArticles() {
   const [content, setContent] = useState("");
 
   const [formState, action, isPending] = useActionState(createArticles, {

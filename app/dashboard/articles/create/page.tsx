@@ -1,8 +1,8 @@
-import CreateArticles from "@/components/articles/CreateArticles";
+import { CreateArticlePage } from "@/components/articles/CreateArticles";
 import React from "react";
 
 const page = () => {
-  return <CreateArticles />;
+  return <CreateArticlePage />;
 };
 
 export default page;

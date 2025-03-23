@@ -11,8 +11,27 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import RecentArticles from "./RecentArticles";
+import { prisma } from "@/lib/prisma";
 
-const BlogDashboard = () => {
+const BlogDashboard = async () => {
+  const [articles, totalComments] = await Promise.all([
+    prisma.articles.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        comments: true,
+        author: {
+          select: {
+            name: true,
+            email: true,
+            imageUrl: true,
+          },
+        },
+      },
+    }),
+    prisma.comments.count(),
+  ]);
   return (
     <main className="flex-1 p-4 md:p-8">
       {/* Header */}
@@ -41,7 +60,7 @@ const BlogDashboard = () => {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">2</div>
+            <div className="text-2xl font-bold">{articles.length}</div>
             <p className="text-xs text-muted-foreground mt-1">
               +5 from last month
             </p>
@@ -56,7 +75,7 @@ const BlogDashboard = () => {
             <MessageCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5</div>
+            <div className="text-2xl font-bold">{totalComments}</div>
             <p className="text-xs text-muted-foreground mt-1">
               12 awaiting moderation
             </p>
@@ -80,7 +99,7 @@ const BlogDashboard = () => {
       </div>
 
       {/* Recent Articles */}
-      <RecentArticles />
+      <RecentArticles articles={articles} />
     </main>
   );
 };
