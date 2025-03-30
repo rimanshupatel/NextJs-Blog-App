@@ -12,9 +12,7 @@ import {
 } from "../../ui/table";
 import Link from "next/link";
 import { Prisma } from "@prisma/client";
-import { useFormStatus } from "react-dom";
 import { deleteArticle } from "@/actions/deleteArticleAction";
-import { startTransition } from "react";
 
 type RecentArticlesProps = {
   articles: Prisma.ArticlesGetPayload<{
@@ -94,7 +92,8 @@ type DeleteButtonProps = {
   articleId: string;
 };
 const DeleteButtonArticle: React.FC<DeleteButtonProps> = ({ articleId }) => {
-  const { pending } = useFormStatus();
+  const [isPending, startTransition] = useTransition();
+
   return (
     <form
       action={() => {
@@ -103,8 +102,8 @@ const DeleteButtonArticle: React.FC<DeleteButtonProps> = ({ articleId }) => {
         });
       }}
     >
-      <Button disabled={pending} variant={"ghost"} size={"sm"} type="submit">
-        {pending ? "Loading" : "Delete"}
+      <Button disabled={isPending} variant={"ghost"} size={"sm"} type="submit">
+        {isPending ? "Loading" : "Delete"}
       </Button>
     </form>
   );

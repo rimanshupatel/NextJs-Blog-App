@@ -20,25 +20,26 @@ model User {
   name        String
   imageUrl    String?
   articles    Articles[]
-  comments    Comments[]
-  likes       Likes[]
+  comments    Comment[]
+  likes       Like[]
 }
 
 model Articles {
-  id            String     @id @default(cuid())
+  id            String    @id @default(cuid())
   title         String
   content       String
   category      String
   featuredImage String
-  author        User       @relation(fields: [authorID], references: [id])
+  author        User      @relation(fields: [authorID], references: [id])
   authorID      String
-  comments      Comments[]
-  likes         Likes[]
-  createdAt     DateTime   @default(now())
+  comments      Comment[]
+  likes         Like[]
+  createdAt     DateTime  @default(now())
 }
 
-model Comments {
+model Comment {
   id        String   @id @default(cuid())
+  body      String
   author    User     @relation(fields: [authorID], references: [id])
   authorID  String
   articles  Articles @relation(fields: [articleID], references: [id])
@@ -46,7 +47,7 @@ model Comments {
   createdAt DateTime @default(now())
 }
 
-model Likes {
+model Like {
   id        String   @id @default(cuid())
   user      User     @relation(fields: [userID], references: [id])
   userID    String

@@ -1,5 +1,6 @@
 import BgGradient from "@/components/Common/BgGradient"; // Import your BgGradient component
 import { Navbar } from "@/components/Home/Header/Navbar";
+import TopArticles from "@/components/Home/TopArticles";
 import { cn } from "@/lib/utils"; // Import your utility function
 
 export default function Home() {
@@ -70,6 +71,11 @@ export default function Home() {
             </div>
           </div>
         </section>
+        {/* top articles */}
+        <div className="container mx-auto px-6">
+          <h1 className="my-4 font-bold text-3xl">Top Articles</h1>
+          <TopArticles />
+        </div>
 
         {/* Testimonials Section */}
         <section className="py-20 text-black">
