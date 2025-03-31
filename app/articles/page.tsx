@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { prisma } from "@/lib/prisma";
 import { fetchArticleByQuery } from "@/lib/query/fetchArticles";
 import React, { Suspense } from "react";
+import Link from "next/link";
 import {
   Pagination,
   PaginationContent,
@@ -18,12 +19,17 @@ import {
 import { Button } from "@/components/ui/button";
 
 type SearchPageProps = {
-  searchParams: Promise<{ search?: string }>;
+  searchParams: Promise<{ search?: string; page?: string }>;
 };
 const page: React.FC<SearchPageProps> = async ({ searchParams }) => {
   const searchText = (await searchParams).search || "";
-  const articles = await fetchArticleByQuery(searchText);
   const ITEMS_PER_PAGE = 3;
+  const currentPage = Number((await searchParams).page) || 1;
+  const skip = (currentPage - 1) * ITEMS_PER_PAGE;
+  const take = ITEMS_PER_PAGE;
+  const { articles, total } = await fetchArticleByQuery(searchText, skip, take);
+
+  const total_page = Math.ceil(total / ITEMS_PER_PAGE);
   return (
     <section className="container mx-auto px-4 py-12 ">
       {/* Header Section */}
@@ -59,32 +65,56 @@ const page: React.FC<SearchPageProps> = async ({ searchParams }) => {
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-center">
-        <Pagination>
-          <PaginationContent className="gap-2">
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                className="h-10 w-10 rounded-md border border-gray-200 hover:bg-gray-50"
-              />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink
-                href="#"
-                className="h-10 w-10 rounded-md border border-gray-200 hover:bg-gray-50"
-                isActive
-              >
-                1
-              </PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                className="h-10 w-10 rounded-md border border-gray-200 hover:bg-gray-50"
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+      <div className="mt-12 flex justify-center gap-2">
+        {/* Prev Button */}
+        <Link
+          href={`?search=${searchText}&page=${currentPage - 1}`}
+          passHref
+          className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+        >
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={currentPage === 1}
+            className={currentPage === 1 ? "cursor-not-allowed" : ""}
+          >
+            ← Prev
+          </Button>
+        </Link>
+
+        {/* Page Numbers */}
+        {Array.from({ length: total_page }).map((_, index) => (
+          <Link
+            key={index}
+            href={`?search=${searchText}&page=${index + 1}`}
+            passHref
+          >
+            <Button
+              variant={currentPage === index + 1 ? "outline" : "ghost"}
+              size="sm"
+            >
+              {index + 1}
+            </Button>
+          </Link>
+        ))}
+
+        {/* Next Button */}
+        <Link
+          href={`?search=${searchText}&page=${currentPage + 1}`}
+          passHref
+          className={
+            currentPage === total_page ? "pointer-events-none opacity-50" : ""
+          }
+        >
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={currentPage === total_page}
+            className={currentPage === total_page ? "cursor-not-allowed" : ""}
+          >
+            Next →
+          </Button>
+        </Link>
       </div>
     </section>
   );
